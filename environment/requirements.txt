@@ -1,0 +1,20 @@
+# Python 3.11 (tested with the "cps" conda env)
+# Install: pip install -r requirements.txt
+
+# Power system modelling
+pandapower==3.5.4
+
+# Numerics / data
+numpy==2.4.6
+pandas==2.3.3
+scipy==1.16.3
+networkx==3.6.1
+
+# Optimisation (requires a Gurobi licence, free academic licence available)
+gurobipy==13.0.3
+
+# Plotting
+matplotlib==3.11.2
+
+# Jupyter notebook support
+ipykernel==7.3.0
