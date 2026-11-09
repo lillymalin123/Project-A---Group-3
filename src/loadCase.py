@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from pandapower.converter.pypower import from_ppc
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[1]
 CASE57_PATH = REPO_ROOT / "data" / "case57.m"
 
 
