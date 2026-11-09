@@ -1,9 +1,0 @@
-cff-version: 1.2.0
-title: "Project-A---Group-3"
-message: "If you use this project, please cite it using this metadata."
-authors:
-  - family-names: "Group"
-    given-names: "3"
-version: 0.1.0
-date-released: 2026-11-09
-license: MIT
