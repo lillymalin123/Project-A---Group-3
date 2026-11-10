@@ -13,6 +13,7 @@ from pandapower.converter.pypower import from_ppc
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CASE57_PATH = REPO_ROOT / "data" / "case57.m"
+BASE_KV_FALLBACK = 100.0  # kV, used only where the case file gives baseKV = 0
 
 
 def _read_matrix(text, name):
@@ -34,7 +35,7 @@ def load_case57(path=CASE57_PATH, f_hz=60):
 
     Inputs:  path  path to the MATPOWER .m file (default data/case57.m)
              f_hz  system frequency in Hz (MATPOWER cases carry none; 60 for IEEE)
-    Output:  pandapowerNet. Bus indices are 0-based (MATPOWER bus b -> net bus b-1);
+    Output:  pandapowerNet. Bus indices equal the MATPOWER bus NUMBERS (1..57), not 0-based;
              loads/gens in MW/MVAr, line parameters in ohm as converted by pandapower.
     """
     text = Path(path).read_text()
@@ -45,6 +46,9 @@ def load_case57(path=CASE57_PATH, f_hz=60):
         "gen": _read_matrix(text, "gen"),
         "branch": _read_matrix(text, "branch"),
     }
+    # case57.m has baseKV = 0 for every bus, which makes pandapower convert all line impedances to
+    # 0 ohm and the power flow fail. Per-unit results do not depend on the value chosen.
+    ppc["bus"][:, 9] = np.where(ppc["bus"][:, 9] == 0, BASE_KV_FALLBACK, ppc["bus"][:, 9])
     return from_ppc(ppc, f_hz=f_hz)
 
 
