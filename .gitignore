@@ -1,20 +1,20 @@
 # Python bytecode
-__pycache__/
-*.py[cod]
+# __pycache__/
+# *.py[cod]
 
-# # Virtual environments
-# .venv/
-# venv/
-# env/
+# # # Virtual environments
+# # .venv/
+# # venv/
+# # env/
 
-# Jupyter
-.ipynb_checkpoints/
+# # Jupyter
+# .ipynb_checkpoints/
 
-# Editor / IDE
-.vscode/
-.idea/
+# # Editor / IDE
+# .vscode/
+# .idea/
 
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
+# # OS files
+# .DS_Store
+# Thumbs.db
+# desktop.ini

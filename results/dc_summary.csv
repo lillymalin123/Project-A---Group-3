@@ -1,0 +1,15 @@
+quantity,value
+n_buses,57.0
+n_branches,80.0
+n_meters,217.0
+rank_B,56.0
+Pg_total_MW,928.9
+Pd_total_MW,1250.8
+P_slack_case_MW,73.9
+P_slack_dc_MW,395.7999999999998
+slack_gap_MW,-321.89999999999975
+max_abs_dtheta_rad,0.021097241146814855
+max_abs_dtheta_deg,1.208782877082232
+max_dtheta_bus,34.0
+max_flow_MW,177.22595216996402
+max_flow_branch,8.0
