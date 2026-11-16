@@ -1,0 +1,2 @@
+J,m,n,c,dof,alpha,tau,p_value,alarm,largest_norm_resid,lnr_type,lnr_side,lnr_element_0based,lnr_threshold,n_above_lnr_threshold,n_critical
+501.7847372975252,518,113,30,435,0.05,484.6263568782495,0.014626713745613468,True,3.330740581958371,Q_flow,from,28,3.0,5,0

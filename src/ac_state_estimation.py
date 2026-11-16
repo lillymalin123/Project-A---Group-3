@@ -2,7 +2,8 @@
 ac_state_estimation.py --- functions for AC state estimation of the IEEE 57-bus case.
 
 Library only: no printing of results, no file writing except save_measurements. The experiments that
-call these functions are scripts/01_generate_measurements.py and scripts/02_ac_state_estimation.py.
+call these functions are scripts/01_generate_measurements.py, scripts/02_ac_state_estimation.py and
+scripts/03_ac_bad_data.py (bad-data detection: chi-square test and normalized residuals).
 
 Method (Hug & Giampapa 2012, Sec. IV-A): weighted least squares  min (z - h(x))' W (z - h(x)),
 W = diag(1/sigma^2), solved by Gauss-Newton on the normal equations (H'WH) dx = H'W r. Zero active and
@@ -26,6 +27,7 @@ import pandapower as pp
 import pandas as pd
 import scipy.sparse as sp
 import scipy.sparse.linalg as spla
+from scipy.stats import chi2
 
 import config
 from loadCase import load_case57
@@ -206,3 +208,49 @@ def estimate_ac(m, meas, enforce_zero_injection=True, tol=config.NEWTON_TOL, max
     return {"Vm": Vm, "Va": Va, "iterations": it, "step_norms": steps,
             "residual": z - h_of_x(m, meas, Vm, Va), "H": jacobian(m, meas, Vm, Va), "C": C, "weights": w,
             "n_meas": len(z), "n_states": 2 * nb - 1, "n_constraints": len(cons)}
+
+
+# ----------------------------------------------------------------------------- bad-data detection
+def degrees_of_freedom(est):
+    """Degrees of freedom of the chi-square test: measurements - states + independent constraints."""
+    return est["n_meas"] - est["n_states"] + est["n_constraints"]
+
+
+def chi_square_test(est, alpha=config.ALPHA):
+    """Chi-square bad-data test on an ``estimate_ac`` result.
+
+    Statistic J = r' W r (dimensionless). Under the model and no attack J is approximately
+    chi-square with ``degrees_of_freedom`` degrees of freedom (exact only for a linear model).
+    Returns a dict: J, dof, tau (threshold = (1 - alpha) quantile), p_value, alarm (True if J > tau).
+    """
+    J = float(est["residual"] @ (est["weights"] * est["residual"]))
+    dof = degrees_of_freedom(est)
+    tau = float(chi2.ppf(1.0 - alpha, dof))
+    return {"J": J, "dof": dof, "tau": tau, "p_value": float(chi2.sf(J, dof)), "alarm": bool(J > tau)}
+
+
+def residual_variances(est):
+    """Variance of each residual, diag(Omega) with Omega = R - H N H', linearised at the estimate.
+
+    N = G^-1 - G^-1 C' (C G^-1 C')^-1 C G^-1 is the covariance of the constrained estimate,
+    G = H' W H, R = diag(sigma^2). Returns a vector in (p.u.^2 or rad^2), one entry per measurement.
+    """
+    H, C, w = est["H"].toarray(), est["C"].toarray(), est["weights"]
+    Ginv = np.linalg.inv(H.T @ (w[:, None] * H))
+    N = Ginv
+    if C.shape[0]:
+        N = Ginv - Ginv @ C.T @ np.linalg.solve(C @ Ginv @ C.T, C @ Ginv)
+    return 1.0 / w - np.einsum("ij,jk,ik->i", H, N, H)
+
+
+def normalized_residuals(est, critical_fraction=config.CRITICAL_VAR_FRACTION):
+    """|r_i| / sqrt(Omega_ii) for every measurement (dimensionless, ~N(0,1) per entry without bad data).
+
+    Entries whose residual variance is below ``critical_fraction`` of sigma_i^2 are critical
+    measurements (their residual carries no information) and are returned as NaN.
+    """
+    var = residual_variances(est)
+    crit = var < critical_fraction / est["weights"]
+    out = np.abs(est["residual"]) / np.sqrt(np.where(crit, 1.0, var))
+    out[crit] = np.nan
+    return out
