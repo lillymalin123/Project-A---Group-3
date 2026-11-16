@@ -1,7 +1,7 @@
 """
 ac_operating_point.py --- Block 1 for the AC model: the 57-bus grid and its operating point.
 
-Run:   python src/ac_operating_point.py        (loadCase.py must sit next to this file)
+Run from anywhere:   python scripts/00_ac_operating_point.py
 
 DC Block 1 step              ->  AC step in this file
   1.1 P = Pg - Pd            ->  specified injections: P and Q of loads, P and |V| of generators
@@ -9,18 +9,21 @@ DC Block 1 step              ->  AC step in this file
   1.3 solve B~ theta = P~    ->  nonlinear power flow  S_i = V_i conj((Ybus V)_i)  (pandapower runpp)
   1.4 slack gap, DC vs AC    ->  slack P and Q, total active losses
 
-Writes results/ac_operating_point.csv. Exits non-zero if a check fails.
+Writes results/ac_operating_point.csv (P_inj/Q_inj are NET bus injections: generation minus load).
+Exits non-zero if a check fails.
 
 Conventions: internal index k = bus number k+1 (pandapower index = MATPOWER bus number);
 power in p.u. on baseMVA unless a name says MW/MVAr, angles in radians unless a name says deg.
 """
 import sys
 import warnings
+from pathlib import Path
 
 import numpy as np
 import pandapower as pp
 import pandas as pd
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # src/ holds loadCase.py
 from loadCase import REPO_ROOT, load_case57
 
 warnings.filterwarnings("ignore", message=".*numba.*")
@@ -86,7 +89,12 @@ ok.append(check(np.max(np.abs(S * base + demand)) < TOL * base,
 
 # --- 1.4 What the slack supplies, losses ---------------------------------------------------------
 loss = S.real.sum()
-print(f"slack supplies P = {base * S.real[ref]:.1f} MW, Q = {base * S.imag[ref]:.1f} MVAr")
+# S at the slack bus is the NET injection (generation minus the load connected to that bus)
+slack_gen = S[ref] + Pd[ref] + 1j * Qd[ref]
+print(f"slack bus: net injection P = {base * S.real[ref]:.1f} MW, Q = {base * S.imag[ref]:.1f} MVAr; "
+      f"generator output = net + local load = {base * slack_gen.real:.1f} MW, {base * slack_gen.imag:.1f} MVAr")
+print(f"total generation {base * (Pg.sum() + slack_gen.real):.1f} MW = load {base * Pd.sum():.1f} MW "
+      f"+ losses {base * loss:.1f} MW")
 print(f"total active losses = {base * loss:.1f} MW (the DC model assumes 0)")
 ok.append(check(loss > 0, "active losses > 0"))
 print(f"Vm range {Vm.min():.3f} .. {Vm.max():.3f} p.u.;  Va range {np.degrees(Va.min()):.1f} .. {np.degrees(Va.max()):.1f} deg")
