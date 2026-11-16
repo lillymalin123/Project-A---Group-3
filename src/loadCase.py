@@ -11,9 +11,8 @@ from pathlib import Path
 import numpy as np
 from pandapower.converter.pypower import from_ppc
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-CASE57_PATH = REPO_ROOT / "data" / "case57.m"
-BASE_KV_FALLBACK = 100.0  # kV, used only where the case file gives baseKV = 0
+
+from config import BASE_KV_FALLBACK, CASE57_PATH, F_HZ
 
 
 def _read_matrix(text, name):
@@ -29,7 +28,7 @@ def _read_matrix(text, name):
     return np.array(rows)
 
 
-def load_case57(path=CASE57_PATH, f_hz=60):
+def load_case57(path=CASE57_PATH, f_hz=F_HZ):
     """
     Load a MATPOWER case file (.m) and return it as a pandapower net.
 

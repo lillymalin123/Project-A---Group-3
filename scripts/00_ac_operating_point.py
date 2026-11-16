@@ -24,11 +24,12 @@ import pandapower as pp
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # src/ holds loadCase.py
-from loadCase import REPO_ROOT, load_case57
+from config import ROOT
+from loadCase import load_case57
 
 warnings.filterwarnings("ignore", message=".*numba.*")
 TOL = 1e-6  # p.u., tolerance of the consistency checks
-RESULTS_DIR = REPO_ROOT / "results"
+RESULTS_DIR = ROOT / "results"
 
 
 def check(ok, what, note=""):
