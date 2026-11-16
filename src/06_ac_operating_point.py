@@ -21,6 +21,7 @@ import numpy as np
 import pandapower as pp
 import pandas as pd
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # src/ holds loadCase.py
 from config import ROOT
 from loadCase import load_case57
 
