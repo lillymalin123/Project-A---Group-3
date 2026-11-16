@@ -7,6 +7,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]  # repository root (this file lives in src/)
 
+# Network case
+CASE57_PATH = ROOT / "data" / "case57.m"  # MATPOWER IEEE 57-bus case, supplied with the brief
+BASE_KV_FALLBACK = 100.0  # kV; replaces baseKV = 0 in case57.m (p.u. results do not depend on it)
+F_HZ = 60  # Hz; system frequency (MATPOWER cases carry none; IEEE cases are 60 Hz)
+
 # Random draws (record SEED in the README, rule 7)
 SEED = 2026  # CHOOSE: any integer, but fix it and report it
 
