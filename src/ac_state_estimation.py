@@ -42,7 +42,8 @@ def build_model(net=None):
     Output keys: nb, nl (numbers of buses and branches); bus_numbers (bus number of each position);
     Ybus (nb x nb), Yf, Yt (nl x nb) complex admittance matrices; Cf, Ct (nl x nb) branch-bus
     connection matrices; f, t (end positions of each branch); ref (position of the slack bus);
-    zero_inj (bool per bus: no load and no generator); Vm_true [p.u.], Va_true [rad] (power-flow state).
+    zero_inj (bool per bus: no load and no generator); Vm_true [p.u.], Va_true [rad] (power-flow state);
+    x_dc (effective series reactance x * tap per branch [p.u.], used by the DC model in dc_state_estimation.py).
     Reads pandapower's internal solution (net._ppc), tested with pandapower 3.5.6.
     """
     net = load_case57() if net is None else net
@@ -60,6 +61,8 @@ def build_model(net=None):
     has_inj = np.zeros(nb, dtype=bool)  # bus with a load or a generator (shunts do not count)
     for tbl in (net.load, net.gen, net.ext_grid):
         has_inj[tbl.bus.to_numpy() - first] = True
+    tap = ppc["branch"][:, 8].real
+    tap = np.where(tap == 0, 1.0, tap)  # MATPOWER convention: tap 0 means ratio 1 (a line)
     return {
         "nb": nb, "nl": nl, "bus_numbers": net.bus.index.to_numpy(),
         "Ybus": Y["Ybus"].tocsr(), "Yf": Y["Yf"].tocsr(), "Yt": Y["Yt"].tocsr(),
@@ -69,6 +72,7 @@ def build_model(net=None):
         "ref": int(net._pd2ppc_lookups["bus"][net.ext_grid.bus.iloc[0]]),
         "zero_inj": ~has_inj,
         "Vm_true": net.res_bus.vm_pu.to_numpy(), "Va_true": np.deg2rad(net.res_bus.va_degree.to_numpy()),
+        "x_dc": ppc["branch"][:, 3].real * tap,
     }
 
 
