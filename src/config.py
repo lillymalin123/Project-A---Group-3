@@ -41,5 +41,5 @@ CONSTRAINT_TOL = 1e-9  # zero-injection constraints must hold to this (p.u.)
 DOF_CHECK_TOL = 1e-6  # relative tolerance of the check sum(w_i * Omega_ii) = dof
 
 # Attack settings
-attack_bus = 2 # Location of the attack
-attack_mag = [1e-4, 1e-3, 1e-2, 1e-1, 1, 1e1] # Varying c over several orders of magnitude
+ATTACK_BUS = 2 # Location of the attack
+
