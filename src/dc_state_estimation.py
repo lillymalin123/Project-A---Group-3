@@ -61,7 +61,7 @@ def embed_dc_vector(meas, a_dc):
 
 
 # ----------------------------------------------------------------------------- DC model
-def _dc_full_matrices(m):
+def dc_bus_matrices(m):
     """Bf (nl x nb): from-end flows Bf theta_all; Bbus (nb x nb): injections Bbus theta_all (all buses)."""
     b = 1.0 / m["x_dc"]
     A = (m["Cf"] - m["Ct"]).tocsr()  # branch-bus incidence: +1 at the from bus, -1 at the to bus
@@ -81,7 +81,7 @@ def dc_measurement_matrix(m, meas):
     if bad.any():
         raise ValueError(f"non-DC measurement types in the table: {sorted(set(meas['type'][bad]))}")
     nl, nb = m["nl"], m["nb"]
-    Bf, Bbus = _dc_full_matrices(m)
+    Bf, Bbus = dc_bus_matrices(m)
     cand = sp.vstack([Bf, -Bf, Bbus, sp.identity(nb, format="csr")], format="csr")  # [Pf; Pt; Pinj; Va]
     off = {("P_flow", "from"): 0, ("P_flow", "to"): nl, ("P_inj", ""): 2 * nl, ("Va", ""): 2 * nl + nb}
     rows = np.array([off[(ty, s)] + e for ty, s, e in zip(meas["type"], meas["side"], meas["element"])])
@@ -90,7 +90,7 @@ def dc_measurement_matrix(m, meas):
 
 def dc_zero_injection_matrix(m):
     """C_DC, shape (n_zero_injection, nb - 1): the constraints P_i = C theta = 0 at zero-injection buses."""
-    _, Bbus = _dc_full_matrices(m)
+    _, Bbus = dc_bus_matrices(m)
     return Bbus[np.flatnonzero(m["zero_inj"])][:, _non_ref_columns(m)].tocsr()
 
 

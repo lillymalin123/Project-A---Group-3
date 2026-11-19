@@ -1,0 +1,2 @@
+J,m,n,c,dof,alpha,tau,p_value,alarm,largest_norm_resid,lnr_type,lnr_side,lnr_element_0based,lnr_threshold,n_above_lnr_threshold,n_critical,J_model_mismatch_noise_free
+921.4005376582156,259,56,15,218,0.05,253.4444512146718,3.657209278973408e-87,True,9.5922611157628,P_inj,,0,3.0,36,0,637.6796651300375
