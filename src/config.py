@@ -43,3 +43,8 @@ DOF_CHECK_TOL = 1e-6  # relative tolerance of the check sum(w_i * Omega_ii) = do
 # Attack settings
 ATTACK_BUS = 2 # Location of the attack
 
+# Size of the angle shift (rad). CHOSEN so the DC-attacked flow on the line nearest ATTACK_BUS changes by
+# about 50% of its true value -- comparable to the worked example in Hug & Giampapa 2012, Sec. VI-B.
+# Picked once against the frozen baseline draw; record/justify in the report, do not re-tune per draw.
+ATTACK_ANGLE_SHIFT_RAD = 0.0143
+
