@@ -48,3 +48,6 @@ ATTACK_BUS = 2 # Location of the attack
 # Picked once against the frozen baseline draw; record/justify in the report, do not re-tune per draw.
 ATTACK_ANGLE_SHIFT_RAD = 0.0143
 
+# Q5 sweep: magnitudes t of the angle shift at ATTACK_BUS (rad), 3 points per decade from 1e-4 to 1 rad
+ATTACK_MAGNITUDES = [10 ** (k / 3) for k in range(-12, 1)]
+SWEEP_DJ_TOL = 1e-6  # self-check: the noise-free nonlinear attack must change J by less than this
