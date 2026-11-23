@@ -60,3 +60,7 @@ FIGURES_DIR = ROOT / "figures"
 # Q3 --- zero-injection buses and the measurements a hidden attack must change
 ATTACK_SUPPORT_TOL = 1e-9  # |a_i| above this (p.u. / rad) counts as a measurement the attacker must change
 
+# Q5 sweep: magnitudes t of the angle shift at ATTACK_BUS (rad), 3 points per decade from 1e-4 to 1 rad
+ATTACK_MAGNITUDES = [10 ** (k / 3) for k in range(-12, 1)]
+SWEEP_DJ_TOL = 1e-6  # self-check: the noise-free nonlinear attack must change J by less than this
+
