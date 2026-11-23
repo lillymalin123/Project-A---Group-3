@@ -48,6 +48,19 @@ ATTACK_BUS = 2 # Location of the attack
 # Picked once against the frozen baseline draw; record/justify in the report, do not re-tune per draw.
 ATTACK_ANGLE_SHIFT_RAD = 0.0143
 
+# Q3 --- Monte Carlo check of the chi-square test without attack (project brief, Sec. 4)
+MC_SIGMAS = (0.01, 0.02, 0.05, 0.1)  # p.u. for P, Q and Vm, rad for Va: one value for every measurement type
+MC_N_DRAWS = 2000  # independent noise draws per sigma
+MC_SEED = 1122  # CHOOSE: any integer, but fix it and report it (README). Separate from SEED: the baseline
+#                 draw stays frozen; each sigma gets its own child stream (numpy SeedSequence.spawn)
+MC_DRAWS_CSV = RESULTS_DIR / "q3_mc_draws.csv"  # one row per (sigma, draw), written by scripts/06
+MC_REFERENCE_CSV = RESULTS_DIR / "q3_mc_reference.csv"  # one row per sigma: dof, thresholds, DC noncentrality
+FIGURES_DIR = ROOT / "figures"
+
+# Q3 --- zero-injection buses and the measurements a hidden attack must change
+ATTACK_SUPPORT_TOL = 1e-9  # |a_i| above this (p.u. / rad) counts as a measurement the attacker must change
+
 # Q5 sweep: magnitudes t of the angle shift at ATTACK_BUS (rad), 3 points per decade from 1e-4 to 1 rad
 ATTACK_MAGNITUDES = [10 ** (k / 3) for k in range(-12, 1)]
 SWEEP_DJ_TOL = 1e-6  # self-check: the noise-free nonlinear attack must change J by less than this
+
