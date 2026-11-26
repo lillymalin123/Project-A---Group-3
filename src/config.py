@@ -64,3 +64,7 @@ ATTACK_SUPPORT_TOL = 1e-9  # |a_i| above this (p.u. / rad) counts as a measureme
 ATTACK_MAGNITUDES = [10 ** (k / 3) for k in range(-12, 1)]
 SWEEP_DJ_TOL = 1e-6  # self-check: the noise-free nonlinear attack must change J by less than this
 
+SLOPE_FIT_T_MAX = 1e-3     # rad; fit the slope of log|dJ| against log t only below this (small-attack regime)
+PREDICTION_T = 1e-4        # rad; t at which dJ is predicted (Lecture 6) and compared; must be in ATTACK_MAGNITUDES
+SHIFT_RATIO_T = 1e-2       # rad; t at which the estimated angle change / t is reported
+PREDICTION_REL_TOL = 0.05  # self-check: |dJ_pred - dJ_sim| / |dJ_sim| must be below this

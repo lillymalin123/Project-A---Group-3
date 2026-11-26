@@ -112,3 +112,14 @@ def build_ac_nonlinear_attack(m, meas, Vm_hat, Va_hat, c_ac):
 
     # The attack itself
     return h_of_x(m, meas, Vm_new, Va_new) - h_of_x(m, meas, Vm_hat, Va_hat)
+
+def predicted_dJ(S, w, d, r):
+    """Predicted change of the chi-square statistic from the leaked part d of an attack (Lecture 6, slide 9).
+
+    S  residual sensitivity (ac_state_estimation.residual_sensitivity), w weights 1/sigma^2,
+    d  leaked part a - [h(x_hat + c) - h(x_hat)] (p.u. / rad), r residual before the attack.
+    The residual becomes r + S d, so dJ = 2 r'W S d + (S d)'W (S d). Returns (cross, quadratic), dimensionless.
+    Exact for a linear model; for the AC model it omits the term from the change of the Jacobian (order t^2 |r|).
+    """
+    dr = S @ d
+    return float(2 * r @ (w * dr)), float(dr @ (w * dr))

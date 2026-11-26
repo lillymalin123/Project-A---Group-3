@@ -246,6 +246,19 @@ def residual_variances(est):
         N = Ginv - Ginv @ C.T @ np.linalg.solve(C @ Ginv @ C.T, C @ Ginv)
     return 1.0 / w - np.einsum("ij,jk,ik->i", H, N, H)
 
+def residual_sensitivity(est):
+    """Residual sensitivity S = I - H N H' W of a (linearised, constrained) WLS estimate (Lecture 6, slide 9).
+
+    A change d in the measurements changes the residual by S d (to first order), so an attack a leaks
+    S a into the residual and a = H c with C c = 0 leaks nothing. N is the constrained state covariance
+    (as in residual_variances), W = diag(weights). Returns a dense (n_meas x n_meas) array, dimensionless.
+    """
+    H, C, w = est["H"].toarray(), est["C"].toarray(), est["weights"]
+    N = np.linalg.inv(H.T @ (w[:, None] * H))
+    if C.shape[0]:
+        N = N - N @ C.T @ np.linalg.solve(C @ N @ C.T, C @ N)
+    return np.eye(len(w)) - H @ N @ (H.T * w)
+
 
 def normalized_residuals(est, critical_fraction=config.CRITICAL_VAR_FRACTION):
     """|r_i| / sqrt(Omega_ii) for every measurement (dimensionless, ~N(0,1) per entry without bad data).
